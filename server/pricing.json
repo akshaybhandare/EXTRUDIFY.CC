@@ -1,0 +1,46 @@
+{
+  "maxFileSizeBytes": 8388608,
+  "quoteSettings": {
+    "buildX": 256,
+    "buildY": 256,
+    "buildZ": 256,
+    "shell": 1.2,
+    "layer": 0.2,
+    "speed": 50,
+    "rate": 100,
+    "minProfit": 50
+  },
+  "densities": {
+    "PLA": 1.24,
+    "ABS": 1.04,
+    "PETG": 1.27
+  },
+  "materialPremiums": {
+    "PLA": 0,
+    "ABS": 5,
+    "PETG": 3
+  },
+  "filamentCatalog": [
+    {
+      "id": "pla-basic",
+      "label": "PLA",
+      "type": "PLA",
+      "pricePerKg": 9990,
+      "colors": ["White", "Black", "Orange", "Gray", "Blue"]
+    },
+    {
+      "id": "petg-basic",
+      "label": "PETG",
+      "type": "PETG",
+      "pricePerKg": 1850,
+      "colors": ["Clear", "Black", "White", "Blue"]
+    },
+    {
+      "id": "abs-basic",
+      "label": "ABS",
+      "type": "ABS",
+      "pricePerKg": 1750,
+      "colors": ["Black", "White", "Gray"]
+    }
+  ]
+}

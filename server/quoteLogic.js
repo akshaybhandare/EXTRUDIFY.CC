@@ -1,16 +1,4 @@
-import { getFilamentById, quoteSettings } from './pricingConfig.js'
-
-const densities = {
-  PLA: 1.24,
-  ABS: 1.04,
-  PETG: 1.27,
-}
-
-const materialPremiums = {
-  PLA: 0,
-  ABS: 5,
-  PETG: 3,
-}
+import { densities, getFilamentById, materialPremiums, quoteSettings } from './pricingConfig.js'
 
 export function calculateDynamicProfit(vol_cm3, time_hr, material, layer) {
   let baseProfit = 20
