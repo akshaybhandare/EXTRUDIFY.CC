@@ -145,7 +145,7 @@ export function toArrayBuffer(buffer) {
   return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
 }
 
-export function calculateQuoteFromBuffer(fileBuffer, filamentId, infillValue) {
+export function calculateQuoteFromBuffer(fileBuffer, filamentId, infillValue, copiesValue = 1) {
   const filament = getFilamentById(filamentId)
   const arrayBuffer = toArrayBuffer(fileBuffer)
   const triangles = parseSTL(arrayBuffer)
@@ -157,6 +157,7 @@ export function calculateQuoteFromBuffer(fileBuffer, filamentId, infillValue) {
   const { volume, area } = volumeAndArea(triangles)
   const bbox = getBoundingBox(triangles)
   const infill = Number(infillValue) / 100
+  const copies = Math.max(1, Number(copiesValue) || 1)
   const shell = quoteSettings.shell
   const layer = quoteSettings.layer
   const speed = quoteSettings.speed
@@ -190,10 +191,12 @@ export function calculateQuoteFromBuffer(fileBuffer, filamentId, infillValue) {
     appliedMinimum = true
   }
 
-  const finalPrice = baseCost + profitAmount
+  const singleUnitPrice = baseCost + profitAmount
+  const finalPrice = singleUnitPrice * copies
 
   return {
     finalPrice: Number(finalPrice.toFixed(2)),
+    copies,
     modelFits,
     dimensions: {
       width: Number(bbox.width.toFixed(1)),
@@ -204,6 +207,7 @@ export function calculateQuoteFromBuffer(fileBuffer, filamentId, infillValue) {
       filamentLabel: filament.label,
       filamentType: filament.type,
       infill: Number(infillValue),
+      copies,
       effectiveVolumeCm3: Number(vol_cm3.toFixed(2)),
       weightG: Number(weight_g.toFixed(2)),
       printTimeHours: Number(time_hr.toFixed(2)),
@@ -211,6 +215,7 @@ export function calculateQuoteFromBuffer(fileBuffer, filamentId, infillValue) {
       machineCost: Number(machineCost.toFixed(2)),
       baseCost: Number(baseCost.toFixed(2)),
       profitAmount: Number(profitAmount.toFixed(2)),
+      singleUnitPrice: Number(singleUnitPrice.toFixed(2)),
       appliedMinimum,
     },
   }

@@ -55,7 +55,7 @@ function createTransporter() {
 }
 
 function validateSubmitFields(body) {
-  const required = ['name', 'email', 'phone', 'addressLine1', 'city', 'state', 'postalCode', 'country', 'filamentId', 'color', 'infill']
+  const required = ['name', 'email', 'phone', 'addressLine1', 'city', 'state', 'postalCode', 'country', 'filamentId', 'color', 'infill', 'copies']
   for (const key of required) {
     if (!String(body[key] || '').trim()) {
       return `${key} is required`
@@ -100,6 +100,7 @@ app.get('/api/quote/options', (_req, res) => {
     filaments: getPublicCatalog(),
     defaults: {
       infill: 20,
+      copies: 1,
       buildVolume: {
         x: quoteSettings.buildX,
         y: quoteSettings.buildY,
@@ -119,11 +120,13 @@ app.post('/api/quote/preview', upload.single('file'), async (req, res) => {
 
     const filamentId = req.body.filamentId || getPublicCatalog()[0].id
     const infill = Number(req.body.infill || 20)
-    const quote = calculateQuoteFromBuffer(req.file.buffer, filamentId, infill)
+    const copies = Number(req.body.copies || 1)
+    const quote = calculateQuoteFromBuffer(req.file.buffer, filamentId, infill, copies)
 
     res.json({
       price: quote.finalPrice,
       modelFits: quote.modelFits,
+      copies: quote.copies,
     })
   } catch (error) {
     res.status(400).json({ error: error.message || 'Could not calculate quote' })
@@ -146,7 +149,12 @@ app.post('/api/quote/submit', upload.single('file'), async (req, res) => {
     }
 
     const filament = getFilamentById(req.body.filamentId)
-    const quote = calculateQuoteFromBuffer(req.file.buffer, req.body.filamentId, Number(req.body.infill || 20))
+    const quote = calculateQuoteFromBuffer(
+      req.file.buffer,
+      req.body.filamentId,
+      Number(req.body.infill || 20),
+      Number(req.body.copies || 1),
+    )
     const safeName = `${Date.now()}-${slugify(req.body.name)}.stl`
 
     await ensureTmpDir()
@@ -170,6 +178,7 @@ app.post('/api/quote/submit', upload.single('file'), async (req, res) => {
         address,
         '',
         `Quoted Price: Rs ${quote.finalPrice}`,
+        `Copies: ${quote.copies}`,
         `Filament: ${filament.label}`,
         `Color: ${req.body.color}`,
         `Custom Filament Request: ${req.body.customFilament || 'None'}`,

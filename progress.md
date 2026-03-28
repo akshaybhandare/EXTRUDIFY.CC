@@ -20,3 +20,4 @@
 - [x] Added a simple Express quote backend with temp STL handling and email sending
 - [x] Rebuilt `/quote` into a customer-safe live quotation flow
 - [x] Locked quote calculations to the `3d.html` pricing logic on the server
+- [x] Added copy-count support to quote pricing and request emails

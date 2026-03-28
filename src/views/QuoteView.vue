@@ -84,6 +84,11 @@
                 <input v-model.number="form.infill" class="field-input" type="number" min="0" max="100" />
               </div>
 
+              <div class="space-y-2">
+                <label class="field-label">Copies</label>
+                <input v-model.number="form.copies" class="field-input" type="number" min="1" step="1" />
+              </div>
+
               <div class="space-y-2 md:col-span-2">
                 <label class="field-label">Other filament needed</label>
                 <input v-model="form.customFilament" class="field-input" type="text" placeholder="Optional special filament request" />
@@ -221,6 +226,7 @@ const isWireframe = ref(false)
 const form = reactive({
   filamentId: '',
   color: '',
+  copies: 1,
   customFilament: '',
   infill: 20,
   notes: '',
@@ -390,6 +396,7 @@ async function fetchOptions() {
   form.filamentId = options.filaments[0]?.id || ''
   form.color = options.filaments[0]?.colors?.[0] || ''
   form.infill = options.defaults.infill || 20
+  form.copies = options.defaults.copies || 1
 }
 
 function handleDrop(event) {
@@ -431,6 +438,7 @@ async function requestQuotePreview() {
   payload.append('file', selectedFile.value)
   payload.append('filamentId', form.filamentId)
   payload.append('infill', String(form.infill))
+  payload.append('copies', String(form.copies))
 
   try {
     const response = await fetch('/api/quote/preview', {
@@ -474,6 +482,7 @@ async function submitQuote() {
   payload.append('file', selectedFile.value)
   payload.append('filamentId', form.filamentId)
   payload.append('color', form.color)
+  payload.append('copies', String(form.copies))
   payload.append('customFilament', form.customFilament)
   payload.append('infill', String(form.infill))
   payload.append('notes', form.notes)
@@ -523,6 +532,15 @@ watch(
   () => {
     if (form.infill < 0) form.infill = 0
     if (form.infill > 100) form.infill = 100
+    queuePreview()
+  },
+)
+
+watch(
+  () => form.copies,
+  () => {
+    if (form.copies < 1) form.copies = 1
+    form.copies = Math.floor(form.copies || 1)
     queuePreview()
   },
 )
